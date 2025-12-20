@@ -84,9 +84,14 @@ public class GameController : MonoBehaviour
     [SerializeField] private GimmickPress gimmickPress = null;
     [SerializeField] private GimmickFire gimmickFire = null;
 
+    [SerializeField] private UIMain mainUI = null;
+
     [SerializeField] private float defectRate = 0.5f;
 
-    private float _time = 0.0f;
+    private float _totalTime = 0.0f;
+    private float _currentTime = 0.0f;
+    private bool _isTimeRunning = false;
+    
     private float _railAnimationPlayRate = 1.0f;
     private Snowman _currentSnowman = null;
     
@@ -130,6 +135,20 @@ public class GameController : MonoBehaviour
         SpawnSnowman();
     }
 
+    private void Update()
+    {
+        if (_isTimeRunning)
+        {
+            _currentTime -= Time.deltaTime;
+            var elapsedRatio = 1.0f - (_currentTime / _totalTime);
+            mainUI.SetTimerSlider(elapsedRatio);
+            if (_currentTime < 0.0f)
+            {
+                GameOver();
+            }
+        }
+    }
+
     private void Init()
     {
         _railAnimationPlayRate = 1.0f;
@@ -166,6 +185,13 @@ public class GameController : MonoBehaviour
         _isProcessing = false;
     }
     
+    private void GameOver()
+    {
+        Debug.LogError("GameOver");
+        _isTimeRunning = false;
+        
+    }
+    
     private void CreateRandomMission()
     {
         var idCount = Tables.Instance.GetTable<MissionTd>().GetKeys.Count();
@@ -173,7 +199,10 @@ public class GameController : MonoBehaviour
         var data = Tables.Instance.GetTable<MissionTd>().GetData(id);
         if (data == null) return;
 
-        _time = data.time;
+        _totalTime = _currentTime = data.time;
+        mainUI.SetTimerSlider(0.0f);
+        _isTimeRunning = true;
+        
         GenerateSpawnQueue(data);
     }
     

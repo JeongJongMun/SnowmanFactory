@@ -391,6 +391,7 @@ MonoBehaviour:
   arrivalPoint: {fileID: 1846932151}
   gimmickPress: {fileID: 156378381}
   gimmickFire: {fileID: 558967399}
+  mainUI: {fileID: 1533216581}
   defectRate: 0.5
 --- !u!1 &328189350
 GameObject:
@@ -1428,7 +1429,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 0}
   m_FillRect: {fileID: 6623589}
   m_HandleRect: {fileID: 0}
@@ -1551,6 +1552,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buttonKill: {fileID: 328189351}
   buttonPass: {fileID: 1203877129}
+  sliderTimer: {fileID: 1357129271}
   controller: {fileID: 303699311}
 --- !u!114 &1533216582
 MonoBehaviour:
