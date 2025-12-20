@@ -1,4 +1,4 @@
-using Core.Scripts;
+    using Core.Scripts;
 using Core.Scripts.Manager;
 using Core.Scripts.Table;
 using DG.Tweening;
@@ -17,17 +17,17 @@ public class MainScene : BaseScene
     {
         base.Init();
         
-        Debug.Log("MainScene initialized.");
-        
-        Managers.Toast.ShowToast("Hello, World!");
-        var popup = Managers.UI.ShowPopupUI<UIPopupExample>();
-        
-        DOVirtual.DelayedCall(1.0f, () =>
-        {
-            Managers.UI.ClosePopupUI(popup);
-        });
-        
-        var data = Tables.Instance.GetTable<TestTable>().GetData(1001);
-        Debug.Log($" ID: {data.ID}, Name: {data.Name}, HP: {data.HP}, Damage: {data.Damage}");
+        // Debug.Log("MainScene initialized.");
+        //
+        // Managers.Toast.ShowToast("Hello, World!");
+        // var popup = Managers.UI.ShowPopupUI<UIPopupExample>();
+        //
+        // DOVirtual.DelayedCall(1.0f, () =>
+        // {
+        //     Managers.UI.ClosePopupUI(popup);
+        // });
+        //
+        // var data = Tables.Instance.GetTable<TestTable>().GetData(1001);
+        // Debug.Log($" ID: {data.ID}, Name: {data.Name}, HP: {data.HP}, Damage: {data.Damage}");
     }
 }
