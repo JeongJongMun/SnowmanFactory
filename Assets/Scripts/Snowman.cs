@@ -1,21 +1,15 @@
-    using System;
-using Core.Scripts.Table;
+using System;
 using DG.Tweening;
 using UnityEngine;
-
-public struct MovementData
-{
-    public Vector3 targetPosition;
-    public float duration;
-    public Action doneCallback;
-}
 
 public class Snowman : MonoBehaviour
 {
     [SerializeField] private int id = 0;
     [SerializeField] private Animator animator = null;
+    [SerializeField, Range(0.05f, 0.3f)] private float immediateMoveDuration = 0.2f;
 
-    private MovementData _cachedMovementData;
+    private Vector3 _moveTargetPosition = Vector3.zero;
+    private Action _moveDoneCallback = null;
     
     public void Init(ISnowmanData data)
     {
@@ -29,30 +23,25 @@ public class Snowman : MonoBehaviour
         }
     }
 
-    public void Move()
-    {
-        Move(_cachedMovementData);
-    }
-
     public void MoveImmediate()
     {
-        _cachedMovementData.duration = 0.2f;
-        Move(_cachedMovementData);
+        Move(_moveTargetPosition, immediateMoveDuration, _moveDoneCallback);
     }
-
-    public void Move(MovementData data)
+    
+    public void Move(Vector3 targetPosition, float duration, Action doneCallback = null)
     {
-        _cachedMovementData = data;
-        
-        transform.DOMoveX(data.targetPosition.x, data.duration)
+        _moveTargetPosition = targetPosition;
+        _moveDoneCallback = doneCallback;
+
+        transform.DOMoveX(targetPosition.x, duration)
             .SetEase(Ease.Linear)
             .OnComplete(() =>
             {
                 Destroy(gameObject);
-                data.doneCallback?.Invoke();
+                doneCallback?.Invoke();
             });
     }
-
+    
     public void Stop()
     {
         transform.DOKill();

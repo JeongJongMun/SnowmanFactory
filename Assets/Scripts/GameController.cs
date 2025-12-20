@@ -90,7 +90,7 @@ public class GameController : MonoBehaviour
 
     private float _totalTime = 0.0f;
     private float _currentTime = 0.0f;
-    private bool _isTimeRunning = false;
+    private bool _isPlaying = false;
     
     private float _railAnimationPlayRate = 1.0f;
     private Snowman _currentSnowman = null;
@@ -100,7 +100,7 @@ public class GameController : MonoBehaviour
     private ProductionPeriodData _productionPeriodData = new ProductionPeriodData();
     
 
-    private bool _isProcessing = false;
+    private bool _isProcessingGimmick = false;
     
     public event Action OnSnowmanSpawnEvent = null;
     public event Action OnSnowmanArrivalEvent = null;
@@ -108,18 +108,18 @@ public class GameController : MonoBehaviour
     
     public void Kill()
     {
-        if (_isProcessing || _currentSnowman == null) return;
+        if (_isProcessingGimmick || _currentSnowman == null) return;
         
         // TODO : Random Gimmick Activation
-        _isProcessing = true;
+        _isProcessingGimmick = true;
         gimmickPress.Activate();
     }
 
     public void Pass()
     {
-        if (_isProcessing || _currentSnowman == null) return;
+        if (_isProcessingGimmick || _currentSnowman == null) return;
         
-        _isProcessing = true;
+        _isProcessingGimmick = true;
         _currentSnowman.Stop();
         _currentSnowman.MoveImmediate();
     }
@@ -137,7 +137,7 @@ public class GameController : MonoBehaviour
 
     private void Update()
     {
-        if (_isTimeRunning)
+        if (_isPlaying)
         {
             _currentTime -= Time.deltaTime;
             var elapsedRatio = 1.0f - (_currentTime / _totalTime);
@@ -170,26 +170,25 @@ public class GameController : MonoBehaviour
         };
         gimmickPress.OnFinishDeactivateEvent += () =>
         {
-            _isProcessing = false;
+            _isProcessingGimmick = false;
         };
 
         OnSnowmanArrivalEvent += () =>
         {
-            _isProcessing = false;
+            _isProcessingGimmick = false;
         };
     }
 
     private void Release()
     {
         _railAnimationPlayRate = 1.0f;
-        _isProcessing = false;
+        _isProcessingGimmick = false;
     }
     
     private void GameOver()
     {
         Debug.LogError("GameOver");
-        _isTimeRunning = false;
-        
+        _isPlaying = false;
     }
     
     private void CreateRandomMission()
@@ -198,10 +197,12 @@ public class GameController : MonoBehaviour
         var id = UnityEngine.Random.Range(0, idCount);
         var data = Tables.Instance.GetTable<MissionTd>().GetData(id);
         if (data == null) return;
+        
+        Debug.LogWarning($"Start Mission ID : {data.id}, Goal : {data.goal}, Time : {data.time}");
 
         _totalTime = _currentTime = data.time;
         mainUI.SetTimerSlider(0.0f);
-        _isTimeRunning = true;
+        _isPlaying = true;
         
         GenerateSpawnQueue(data);
     }
@@ -248,9 +249,10 @@ public class GameController : MonoBehaviour
 
     private void SpawnSnowman()
     {
-        if (_snowmanSpawnQueue.Count <= 0)
+        if (_snowmanSpawnQueue.Count <= 0 || !_isPlaying)
         {
-            Debug.Log("모든 눈사람을 검수했습니다! 스테이지 종료.");
+            Debug.Log("모든 눈사람을 검수했거나, 게임이 종료되었습니다.");
+            GameOver();
             return;
         }
         
@@ -262,26 +264,15 @@ public class GameController : MonoBehaviour
         var type = _snowmanSpawnQueue.Dequeue();
         var data = GetSnowmanDataByType(type);
         
-        _currentSnowman = Instantiate(snowmanPrefab, spawnPoint).GetComponent<Snowman>();
-        _currentSnowman.Init(data);
         SetupSnowmanAnimator(data);
         
-        var movementData = new MovementData
+        _currentSnowman = Instantiate(snowmanPrefab, spawnPoint).GetComponent<Snowman>();
+        _currentSnowman.Init(data);
+        _currentSnowman.Move(arrivalPoint.position, moveDuration, () =>
         {
-            targetPosition = arrivalPoint.position,
-            duration = moveDuration,
-            doneCallback = () =>
-            {
-                var seq = DOTween.Sequence();
-                seq.AppendCallback(() =>
-                {
-                    OnSnowmanArrivalEvent?.Invoke();
-                });
-                seq.AppendInterval(spawnInterval);
-                seq.AppendCallback(SpawnSnowman);
-            }
-        };
-        _currentSnowman.Move(movementData);
+            OnSnowmanArrivalEvent?.Invoke();
+            DOVirtual.DelayedCall(spawnInterval, SpawnSnowman);
+        });
     }
     
     private ISnowmanData GetSnowmanDataByType(SnowmanType type)
