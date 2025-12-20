@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7eef4b8b6821ba478fca61b6aa9721d, type: 3}
+  m_Name: MissionTd
+  m_EditorClassIdentifier: 
+  mFirstKey:
+  - 0
+  - 1
+  - 2
+  mSecondKey: []
+  mDataList:
+  - _id: 0
+    _time: 60
+    _goal: 10
+  - _id: 1
+    _time: 90
+    _goal: 20
+  - _id: 2
+    _time: 120
+    _goal: 35

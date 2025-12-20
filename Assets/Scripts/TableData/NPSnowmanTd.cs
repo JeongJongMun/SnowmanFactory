@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Core.Scripts.Table
 {
     [System.Serializable]
-    public class NPSnowmanTdData
+    public class NPSnowmanTdData : ISnowmanData
     {
         [SerializeField]
 		private int _id;

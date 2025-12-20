@@ -16,20 +16,8 @@ public class Snowman : MonoBehaviour
     [SerializeField] private Animator animator = null;
 
     private MovementData _cachedMovementData;
-
-    public void Init(PSnowmanTdData data)
-    {
-        id = data.id;
-
-        var path = $"Animations/Snowman/{data.fullbody_animator_name}/{data.fullbody_animator_name}";
-        var controller = Resources.Load<RuntimeAnimatorController>(path);
-        if (controller != null)
-        {
-            animator.runtimeAnimatorController = controller;
-        }
-    }
-
-    public void Init(NPSnowmanTdData data)
+    
+    public void Init(ISnowmanData data)
     {
         id = data.id;
         
