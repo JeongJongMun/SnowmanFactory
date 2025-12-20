@@ -361,6 +361,12 @@ public class GameController : MonoBehaviour
         {
             case SnowmanType.Normal:
                 mainUI.SetScore(++_score, _currentMissionData.goal);
+                if (_score >= _currentMissionData.goal)
+                {
+                    Debug.LogError("Mission Clear!");
+                    GameOver();
+                }
+                
                 Managers.Sound.Play("SFX_santa", Define.ESoundType.SFX, volume: 1f);
                 break;
             case SnowmanType.Defect:
