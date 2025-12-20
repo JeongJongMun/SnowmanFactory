@@ -310,8 +310,8 @@ public class GameController : MonoBehaviour
                 return GetRandomFromList(pTable.DataList);
 
             case SnowmanType.Spy:
-                // var spyTable = Tables.Instance.GetTable<SpySnowmanTd>();
-                // return GetRandomFromList(spyTable.DataList);
+                var spyTable = Tables.Instance.GetTable<SpySnowmanTd>();
+                return GetRandomFromList(spyTable.DataList);
             case SnowmanType.Defect:
                 var npTable = Tables.Instance.GetTable<NPSnowmanTd>();
                 return GetRandomFromList(npTable.DataList);
