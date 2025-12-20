@@ -176,31 +176,45 @@ public class GameController : MonoBehaviour
         _time = data.time;
         GenerateSpawnQueue(data);
     }
-
+    
     private void GenerateSpawnQueue(MissionTdData missionData)
     {
-        _productionData = new ProductionData();
         _productionData.Initialize(missionData.goal);
-        
+    
+        var typeList = CreateSnowmanTypeList(_productionData);
+    
+        ShuffleList(typeList);
+
+        SetSpawnQueue(typeList);
+
+        _productionPeriodData.SetProductionFlow(_productionData.totalQuantity, missionData.time);
+    }
+
+    private List<SnowmanType> CreateSnowmanTypeList(ProductionData data)
+    {
         var list = new List<SnowmanType>();
+        for (var i = 0; i < data.normalQuantity; i++) list.Add(SnowmanType.Normal);
+        for (var i = 0; i < data.defectQuantity; i++) list.Add(SnowmanType.Defect);
+        for (var i = 0; i < data.spyQuantity; i++) list.Add(SnowmanType.Spy);
+        return list;
+    }
 
-        for (var i = 0; i < _productionData.normalQuantity; i++) list.Add(SnowmanType.Normal);
-        for (var i = 0; i < _productionData.defectQuantity; i++) list.Add(SnowmanType.Defect);
-        for (var i = 0; i < _productionData.spyQuantity; i++) list.Add(SnowmanType.Spy);
-
+    private void ShuffleList<T>(List<T> list)
+    {
         for (var i = 0; i < list.Count; i++)
         {
             var rnd = UnityEngine.Random.Range(i, list.Count);
             (list[i], list[rnd]) = (list[rnd], list[i]);
         }
-
+    }
+    
+    private void SetSpawnQueue(List<SnowmanType> list)
+    {
         _snowmanSpawnQueue.Clear();
         foreach (var type in list)
         {
             _snowmanSpawnQueue.Enqueue(type);
         }
-
-        _productionPeriodData.SetProductionFlow(_productionData.totalQuantity, missionData.time);
     }
 
     private void SpawnSnowman()
@@ -218,16 +232,10 @@ public class GameController : MonoBehaviour
         
         var type = _snowmanSpawnQueue.Dequeue();
         var data = GetSnowmanDataByType(type);
-        var path = $"Animations/Snowman/{data.upperbody_animator_name}/{data.upperbody_animator_name}";
         
         _currentSnowman = Instantiate(snowmanPrefab, spawnPoint).GetComponent<Snowman>();
         _currentSnowman.Init(data);
-        
-        var controller = Resources.Load<RuntimeAnimatorController>(path);
-        if (controller != null)
-        {
-            animatorSnowmanUpperbody.runtimeAnimatorController = controller;
-        }
+        SetupSnowmanAnimator(data);
         
         var movementData = new MovementData
         {
@@ -272,6 +280,15 @@ public class GameController : MonoBehaviour
         return list[UnityEngine.Random.Range(0, list.Count)];
     }
     
+    private void SetupSnowmanAnimator(ISnowmanData data)
+    {
+        var path = $"Animations/Snowman/{data.upperbody_animator_name}/{data.upperbody_animator_name}";
+        var controller = Resources.Load<RuntimeAnimatorController>(path);
+        if (controller != null)
+        {
+            animatorSnowmanUpperbody.runtimeAnimatorController = controller;
+        }
+    }
 
     private void OnDrawGizmos() 
     {
