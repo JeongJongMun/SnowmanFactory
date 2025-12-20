@@ -39,6 +39,8 @@ MonoBehaviour:
   - 23
   - 24
   - 25
+  - 26
+  - 27
   mSecondKey: []
   mDataList:
   - _id: 0
@@ -119,3 +121,9 @@ MonoBehaviour:
   - _id: 25
     _upperbody_animator_name: np_snowman_upperbody_026
     _fullbody_animator_name: np_snowman_fullbody_026
+  - _id: 26
+    _upperbody_animator_name: np_snowman_upperbody_027
+    _fullbody_animator_name: np_snowman_fullbody_027
+  - _id: 27
+    _upperbody_animator_name: np_snowman_upperbody_028
+    _fullbody_animator_name: np_snowman_fullbody_028
