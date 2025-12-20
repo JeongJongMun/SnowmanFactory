@@ -1,3 +1,4 @@
+using Core.Scripts.Manager;
 using System.Collections;
 using UnityEngine;
 
@@ -27,8 +28,8 @@ public class GimmickFire : GimmickBase
     public IEnumerator PlayAndCallback()
     {
         animator.SetTrigger("doPlay");
-        
-        // TODO : Fire sound
+
+        Managers.Sound.Play("SFX_fire", Core.Scripts.Define.ESoundType.SFX, volume: 0.6f);
         
         yield return null;
 
