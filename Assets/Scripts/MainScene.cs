@@ -16,7 +16,10 @@ public class MainScene : BaseScene
     public override void Init()
     {
         base.Init();
-        
+
+        //Sound
+        Managers.Sound.Play("BGM_main", Define.ESoundType.BGM, volume: 0.3f);
+
         // Debug.Log("MainScene initialized.");
         //
         // Managers.Toast.ShowToast("Hello, World!");
