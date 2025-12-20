@@ -8,14 +8,14 @@ public class UIInstruction : MonoBehaviour
     [SerializeField] private RectTransform rectTransform = null;
     [SerializeField] private Image imageDim = null;
 
-    private readonly Vector2 _showSize = new(896, 1500);
-    private readonly Vector2 _hideSize = new(311, 520);
+    private readonly Vector2 _showSize = new(1080, 1920);
+    private readonly Vector2 _hideSize = new(374, 666);
     
     private readonly Quaternion _showRotation = Quaternion.identity;
     private readonly Quaternion _hideRotation = Quaternion.Euler(0, 0, 20);
     
-    private readonly Vector3 _showPosition = new(0, 0, 0);
-    private readonly Vector3 _hidePosition = new(-413, -1122, 0);
+    private readonly Vector3 _showPosition = new(0, -221, 0);
+    private readonly Vector3 _hidePosition = new(-389, -1190, 0);
 
     private bool _isShow = false;
     private float _toggleDuration = 0.5f;
