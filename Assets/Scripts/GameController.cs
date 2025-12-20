@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Core.Scripts.Table;
+using DG.Tweening;
 using UnityEngine;
 
 public struct MissionData
@@ -19,25 +20,33 @@ public class GameController : MonoBehaviour
     [SerializeField] private Transform arrivalPoint = null;
     
     [SerializeField] private GimmickPress gimmickPress = null;
+
+    [SerializeField] private float defectRate = 0.5f;
     
     private float _currentSnowmanMoveDuration = 3.0f;
     private float _railAnimationPlayRate = 1.0f;
     private Snowman _currentSnowman = null;
 
+    private bool _isProcessing = false;
+    
     public event Action OnSnowmanSpawnEvent = null;
     public event Action OnSnowmanArrivalEvent = null;
     public event Action OnSnowmanDeathEvent = null; 
     
     public void Kill()
     {
-        if (_currentSnowman == null) return;
+        if (_isProcessing || _currentSnowman == null) return;
         
         // TODO : Random Gimmick Activation
+        _isProcessing = true;
         gimmickPress.Activate();
     }
 
     public void Pass()
     {
+        if (_isProcessing || _currentSnowman == null) return;
+        
+        _isProcessing = true;
         _currentSnowman.Stop();
         _currentSnowman.MoveImmediate();
     }
@@ -67,7 +76,19 @@ public class GameController : MonoBehaviour
             Destroy(_currentSnowman.gameObject);
             animatorSnowmanUpperbody.runtimeAnimatorController = null;
         };
-        gimmickPress.OnStartDeactivateEvent += SpawnSnowman;
+        gimmickPress.OnStartDeactivateEvent += () =>
+        {
+            SpawnSnowman();
+        };
+        gimmickPress.OnFinishDeactivateEvent += () =>
+        {
+            _isProcessing = false;
+        };
+
+        OnSnowmanArrivalEvent += () =>
+        {
+            _isProcessing = false;
+        };
     }
 
     private void Release()
@@ -82,19 +103,43 @@ public class GameController : MonoBehaviour
 
     private void SpawnSnowman()
     {
-        var idCount = Tables.Instance.GetTable<SnowmanTd>().GetKeys.Count();
-        var id = UnityEngine.Random.Range(0, idCount);
-        var data = Tables.Instance.GetTable<SnowmanTd>().GetData(id);
+        var isFaulty = UnityEngine.Random.value < defectRate;
+        string path;
         
-        var path = $"Animations/Snowman/{data.upperbody_animator_name}/{data.upperbody_animator_name}";
+        if (isFaulty)
+        {
+            var idCount = Tables.Instance.GetTable<NPSnowmanTd>().GetKeys.Count();
+            var id = UnityEngine.Random.Range(0, idCount);
+            var data = Tables.Instance.GetTable<NPSnowmanTd>().GetData(id);
+            if (data == null)
+            {
+                Debug.LogError($"NPSnowmanTd Data Not Found. id:{id}");
+                return;
+            }
+            path = $"Animations/Snowman/{data.upperbody_animator_name}/{data.upperbody_animator_name}";
+            _currentSnowman = Instantiate(snowmanPrefab, spawnPoint).GetComponent<Snowman>();
+            _currentSnowman.Init(data);
+        }
+        else
+        {
+            var idCount = Tables.Instance.GetTable<PSnowmanTd>().GetKeys.Count();
+            var id = UnityEngine.Random.Range(0, idCount);
+            var data = Tables.Instance.GetTable<PSnowmanTd>().GetData(id);
+            if (data == null)
+            {
+                Debug.LogError($"PSnowmanTd Data Not Found. id:{id}");
+                return;
+            }
+            path = $"Animations/Snowman/{data.upperbody_animator_name}/{data.upperbody_animator_name}";
+            _currentSnowman = Instantiate(snowmanPrefab, spawnPoint).GetComponent<Snowman>();
+            _currentSnowman.Init(data);
+        }
+        
         var controller = Resources.Load<RuntimeAnimatorController>(path);
         if (controller != null)
         {
             animatorSnowmanUpperbody.runtimeAnimatorController = controller;
         }
-        
-        _currentSnowman = Instantiate(snowmanPrefab, spawnPoint).GetComponent<Snowman>();
-        _currentSnowman.Init(data);
         
         var movementData = new MovementData
         {
@@ -102,8 +147,13 @@ public class GameController : MonoBehaviour
             duration = _currentSnowmanMoveDuration,
             doneCallback = () =>
             {
-                OnSnowmanArrivalEvent?.Invoke();
-                SpawnSnowman();
+                var seq = DOTween.Sequence();
+                seq.AppendCallback(() =>
+                {
+                    OnSnowmanArrivalEvent?.Invoke();
+                });
+                seq.AppendInterval(0.2f);
+                seq.AppendCallback(SpawnSnowman);
             }
         };
         _currentSnowman.Move(movementData);

@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed592d43af5fc9e4a877704c822146d4, type: 3}
+  m_Name: NPSnowmanTd
+  m_EditorClassIdentifier: 
+  mFirstKey:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  mSecondKey: []
+  mDataList:
+  - _id: 0
+    _upperbody_animator_name: np_snowman_upperbody_001
+    _fullbody_animator_name: np_snowman_fullbody_001
+  - _id: 1
+    _upperbody_animator_name: np_snowman_upperbody_002
+    _fullbody_animator_name: np_snowman_fullbody_002
+  - _id: 2
+    _upperbody_animator_name: np_snowman_upperbody_003
+    _fullbody_animator_name: np_snowman_fullbody_003
+  - _id: 3
+    _upperbody_animator_name: np_snowman_upperbody_004
+    _fullbody_animator_name: np_snowman_fullbody_004
+  - _id: 4
+    _upperbody_animator_name: np_snowman_upperbody_005
+    _fullbody_animator_name: np_snowman_fullbody_005
+  - _id: 5
+    _upperbody_animator_name: np_snowman_upperbody_006
+    _fullbody_animator_name: np_snowman_fullbody_006
+  - _id: 6
+    _upperbody_animator_name: np_snowman_upperbody_007
+    _fullbody_animator_name: np_snowman_fullbody_007

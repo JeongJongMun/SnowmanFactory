@@ -68,7 +68,7 @@ namespace Core.Scripts.Table
 			System.Func<System.Type, string, object> CheckValue = (type, obj) =>
 			{
 				object retVal = null;
-				if (type == typeof(int))
+				if (type == typeof(int))	
 				{
 					retVal = int.Parse(obj);
 				}

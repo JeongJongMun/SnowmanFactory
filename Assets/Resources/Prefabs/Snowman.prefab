@@ -46,8 +46,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   id: 0
-  isFaulty: 0
-  spriteRenderer: {fileID: 7427950874530672977}
   animator: {fileID: 6835416363384163749}
 --- !u!1 &4477042903862429804
 GameObject:
