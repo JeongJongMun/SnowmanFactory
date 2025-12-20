@@ -360,10 +360,13 @@ public class GameController : MonoBehaviour
         {
             case SnowmanType.Normal:
                 mainUI.SetScore(++_score, _currentMissionData.goal);
+                Managers.Sound.Play("SFX_santa", Define.ESoundType.SFX, volume: 1f);
                 break;
             case SnowmanType.Defect:
+                Managers.Sound.Play("SFX_wrong", Define.ESoundType.SFX, volume: 1f);
                 break;
             case SnowmanType.Spy:
+                Managers.Sound.Play("SFX_wrong", Define.ESoundType.SFX, volume: 1f);
                 break;
             case SnowmanType.Invalid:
                 break;
