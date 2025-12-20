@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Core.Scripts.Table;
@@ -102,9 +103,9 @@ public class GameController : MonoBehaviour
 
     private bool _isProcessingGimmick = false;
     
-    public event Action OnSnowmanSpawnEvent = null;
-    public event Action OnSnowmanArrivalEvent = null;
-    public event Action OnSnowmanDeathEvent = null; 
+    public event Action<SnowmanType> OnSnowmanSpawnEvent = null;
+    public event Action<SnowmanType> OnSnowmanArrivalEvent = null;
+    public event Action<SnowmanType> OnSnowmanDeathEvent = null; 
     
     public void Kill()
     {
@@ -132,7 +133,7 @@ public class GameController : MonoBehaviour
     private void Start()
     {
         CreateRandomMission();
-        SpawnSnowman();
+        StartCoroutine(SpawnSnowman());
     }
 
     private void Update()
@@ -160,22 +161,35 @@ public class GameController : MonoBehaviour
         };
         gimmickPress.OnFinishActivateEvent += () =>
         {
-            OnSnowmanDeathEvent?.Invoke();
-            Destroy(_currentSnowman.gameObject);
             animatorSnowmanUpperbody.runtimeAnimatorController = null;
+            OnSnowmanDeathEvent?.Invoke(_currentSnowman.Type);
+            _currentSnowman.Die();
         };
         gimmickPress.OnStartDeactivateEvent += () =>
         {
-            SpawnSnowman();
+            
         };
         gimmickPress.OnFinishDeactivateEvent += () =>
         {
             _isProcessingGimmick = false;
+            StartCoroutine(SpawnSnowman());
         };
 
-        OnSnowmanArrivalEvent += () =>
+        
+        OnSnowmanSpawnEvent += (type) =>
         {
+            HandleSnowmanSpawn(type);
+        };
+        OnSnowmanArrivalEvent += (type) =>
+        {
+            HandleSnowmanArrival(type);
+            
             _isProcessingGimmick = false;
+            StartCoroutine(SpawnSnowman());
+        };
+        OnSnowmanDeathEvent += (type) =>
+        {
+            HandleSnowmanDeath(type);
         };
     }
 
@@ -247,19 +261,21 @@ public class GameController : MonoBehaviour
         }
     }
 
-    private void SpawnSnowman()
+    private IEnumerator SpawnSnowman()
     {
         if (_snowmanSpawnQueue.Count <= 0 || !_isPlaying)
         {
             Debug.Log("모든 눈사람을 검수했거나, 게임이 종료되었습니다.");
             GameOver();
-            return;
+            yield break;
         }
         
         var idx = _productionData.totalQuantity - _snowmanSpawnQueue.Count;
     
         var moveDuration = _productionPeriodData.GetMoveDuration(idx);
         var spawnInterval = _productionPeriodData.GetSpawnInterval(idx);
+
+        yield return new WaitForSeconds(spawnInterval);
         
         var type = _snowmanSpawnQueue.Dequeue();
         var data = GetSnowmanDataByType(type);
@@ -267,11 +283,10 @@ public class GameController : MonoBehaviour
         SetupSnowmanAnimator(data);
         
         _currentSnowman = Instantiate(snowmanPrefab, spawnPoint).GetComponent<Snowman>();
-        _currentSnowman.Init(data);
+        _currentSnowman.Init(data, type);
         _currentSnowman.Move(arrivalPoint.position, moveDuration, () =>
         {
-            OnSnowmanArrivalEvent?.Invoke();
-            DOVirtual.DelayedCall(spawnInterval, SpawnSnowman);
+            OnSnowmanArrivalEvent?.Invoke(type);
         });
     }
     
@@ -308,6 +323,21 @@ public class GameController : MonoBehaviour
         {
             animatorSnowmanUpperbody.runtimeAnimatorController = controller;
         }
+    }
+    
+    private void HandleSnowmanSpawn(SnowmanType type)
+    {
+        
+    }
+
+    private void HandleSnowmanArrival(SnowmanType type)
+    {
+        
+    }
+    
+    private void HandleSnowmanDeath(SnowmanType type)
+    {
+        
     }
 
     private void OnDrawGizmos() 

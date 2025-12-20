@@ -11,9 +11,12 @@ public class Snowman : MonoBehaviour
     private Vector3 _moveTargetPosition = Vector3.zero;
     private Action _moveDoneCallback = null;
     
-    public void Init(ISnowmanData data)
+    public SnowmanType Type { get; private set; }
+    
+    public void Init(ISnowmanData data, SnowmanType type)
     {
         id = data.id;
+        Type = type;
         
         var path = $"Animations/Snowman/{data.fullbody_animator_name}/{data.fullbody_animator_name}";
         var controller = Resources.Load<RuntimeAnimatorController>(path);
@@ -41,8 +44,23 @@ public class Snowman : MonoBehaviour
                 doneCallback?.Invoke();
             });
     }
+
+    public void Die()
+    {
+        Destroy(gameObject);
+    }
     
     public void Stop()
+    {
+        transform.DOKill();
+    }
+    
+    private void OnDestroy()
+    {
+        transform.DOKill();
+    }
+
+    private void OnDisable()
     {
         transform.DOKill();
     }
