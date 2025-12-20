@@ -14,11 +14,54 @@ public interface ISnowmanData
 
 public struct ProductionData
 {
-    public int targetYield;
     public int totalQuantity;
     public int normalQuantity;
     public int defectQuantity;
     public int spyQuantity;
+    
+    public void Initialize(int goal)
+    {
+        totalQuantity = goal * 2;
+        normalQuantity = (int)(totalQuantity * 0.6f);
+        defectQuantity = (int)(totalQuantity * 0.3f);
+        spyQuantity = (int)(totalQuantity * 0.1f);
+    }
+}
+
+public struct ProductionPeriodData
+{
+    public int productionEarlyEnd;
+    public int productionMidEnd;
+
+    public float averagePeriod;
+    public float earlyPeriod;
+    public float midPeriod;
+    public float latePeriod;
+
+    public void SetProductionFlow(int totalQuantity, float totalTime)
+    {
+        productionEarlyEnd = (int)(totalQuantity * 0.4f);
+        productionMidEnd = (int)(totalQuantity * 0.8f);
+
+        averagePeriod = totalTime / totalQuantity;
+        earlyPeriod = averagePeriod * 2.5f;
+        midPeriod = averagePeriod * 1.67f;
+        latePeriod = averagePeriod * 1.0f;
+    }
+    
+    public float GetSpawnInterval(int currentIndex)
+    {
+        if (currentIndex <= productionEarlyEnd) return earlyPeriod * 0.2f;
+        if (currentIndex <= productionMidEnd) return midPeriod * 0.2f;
+        return latePeriod * 0.2f;
+    }
+
+    public float GetMoveDuration(int currentIndex)
+    {
+        if (currentIndex <= productionEarlyEnd) return earlyPeriod * 0.8f;
+        if (currentIndex <= productionMidEnd) return midPeriod * 0.8f;
+        return latePeriod * 0.8f;
+    }
 }
 
 public enum SnowmanType
@@ -42,13 +85,15 @@ public class GameController : MonoBehaviour
     [SerializeField] private GimmickFire gimmickFire = null;
 
     [SerializeField] private float defectRate = 0.5f;
-    [SerializeField] private float snowmanSpawnInterval = 0.2f;
 
     private float _time = 0.0f;
-    private float _currentSnowmanMoveDuration = 3.0f;
     private float _railAnimationPlayRate = 1.0f;
     private Snowman _currentSnowman = null;
+    
     private Queue<SnowmanType> _snowmanSpawnQueue = new Queue<SnowmanType>();
+    private ProductionData _productionData = new ProductionData();
+    private ProductionPeriodData _productionPeriodData = new ProductionPeriodData();
+    
 
     private bool _isProcessing = false;
     
@@ -129,22 +174,19 @@ public class GameController : MonoBehaviour
         if (data == null) return;
 
         _time = data.time;
-        GenerateSpawnQueue(data.goal);
+        GenerateSpawnQueue(data);
     }
 
-    private void GenerateSpawnQueue(int goal)
+    private void GenerateSpawnQueue(MissionTdData missionData)
     {
-        var data = new ProductionData();
-        data.targetYield = goal * 2;
-        data.normalQuantity = (int)(goal * 0.6f);
-        data.defectQuantity = (int)(data.normalQuantity * 0.3f);
-        data.spyQuantity = (int)(data.normalQuantity * 0.1f);
+        _productionData = new ProductionData();
+        _productionData.Initialize(missionData.goal);
         
         var list = new List<SnowmanType>();
 
-        for (var i = 0; i < data.normalQuantity; i++) list.Add(SnowmanType.Normal);
-        for (var i = 0; i < data.defectQuantity; i++) list.Add(SnowmanType.Defect);
-        for (var i = 0; i < data.spyQuantity; i++) list.Add(SnowmanType.Spy);
+        for (var i = 0; i < _productionData.normalQuantity; i++) list.Add(SnowmanType.Normal);
+        for (var i = 0; i < _productionData.defectQuantity; i++) list.Add(SnowmanType.Defect);
+        for (var i = 0; i < _productionData.spyQuantity; i++) list.Add(SnowmanType.Spy);
 
         for (var i = 0; i < list.Count; i++)
         {
@@ -157,6 +199,8 @@ public class GameController : MonoBehaviour
         {
             _snowmanSpawnQueue.Enqueue(type);
         }
+
+        _productionPeriodData.SetProductionFlow(_productionData.totalQuantity, missionData.time);
     }
 
     private void SpawnSnowman()
@@ -167,12 +211,13 @@ public class GameController : MonoBehaviour
             return;
         }
         
+        var idx = _productionData.totalQuantity - _snowmanSpawnQueue.Count;
+    
+        var moveDuration = _productionPeriodData.GetMoveDuration(idx);
+        var spawnInterval = _productionPeriodData.GetSpawnInterval(idx);
+        
         var type = _snowmanSpawnQueue.Dequeue();
         var data = GetSnowmanDataByType(type);
-        if (data == null)
-        {
-            
-        }
         var path = $"Animations/Snowman/{data.upperbody_animator_name}/{data.upperbody_animator_name}";
         
         _currentSnowman = Instantiate(snowmanPrefab, spawnPoint).GetComponent<Snowman>();
@@ -187,7 +232,7 @@ public class GameController : MonoBehaviour
         var movementData = new MovementData
         {
             targetPosition = arrivalPoint.position,
-            duration = _currentSnowmanMoveDuration,
+            duration = moveDuration,
             doneCallback = () =>
             {
                 var seq = DOTween.Sequence();
@@ -195,7 +240,7 @@ public class GameController : MonoBehaviour
                 {
                     OnSnowmanArrivalEvent?.Invoke();
                 });
-                seq.AppendInterval(snowmanSpawnInterval);
+                seq.AppendInterval(spawnInterval);
                 seq.AppendCallback(SpawnSnowman);
             }
         };
