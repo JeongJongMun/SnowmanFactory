@@ -1,3 +1,5 @@
+using Core.Scripts.Manager;
+using Core.Scripts;
 using DG.Tweening;
 using UnityEngine;
 
@@ -20,7 +22,9 @@ public class GimmickPress : GimmickBase
     {
         base.OnActivate();
         
-        transform.DOKill(); 
+        transform.DOKill();
+
+        Managers.Sound.Play("SFX_button", Define.ESoundType.SFX, volume: 2f);
 
         var seq = DOTween.Sequence();
 

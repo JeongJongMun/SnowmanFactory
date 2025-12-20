@@ -132,6 +132,7 @@ public class GameController : MonoBehaviour
         _currentSnowman.MoveImmediate();
 
         //Sonud
+        Managers.Sound.Play("SFX_button", Define.ESoundType.SFX, volume: 2f);
         Managers.Sound.Play("SFX_swoosh", Define.ESoundType.SFX, volume: 1f);
     }
 
@@ -366,7 +367,7 @@ public class GameController : MonoBehaviour
                 Managers.Sound.Play("SFX_wrong", Define.ESoundType.SFX, volume: 1f);
                 break;
             case SnowmanType.Spy:
-                Managers.Sound.Play("SFX_wrong", Define.ESoundType.SFX, volume: 1f);
+                Managers.Sound.Play("SFX_spy", Define.ESoundType.SFX, volume: 1f);
                 break;
             case SnowmanType.Invalid:
                 break;
