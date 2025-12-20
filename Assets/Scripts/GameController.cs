@@ -111,6 +111,8 @@ public class GameController : MonoBehaviour
     public event Action<SnowmanType> OnSnowmanArrivalEvent = null;
     public event Action<SnowmanType> OnSnowmanDeathEvent = null; 
     
+    private ScoreData _scoreData = new ScoreData();
+    private bool _isSpyPassed = false;
     public void Kill()
     {
         if (_isProcessingGimmick || _currentSnowman == null) return;
@@ -207,13 +209,22 @@ public class GameController : MonoBehaviour
         _score = 0;
         _isProcessingGimmick = false;
     }
-    
+
     private void GameOver()
     {
+        if (!_isPlaying) return; 
+
         Debug.LogError("GameOver");
         _isPlaying = false;
+
+        bool missionSuccess = !_isSpyPassed && _score >= _currentMissionData.goal;
+
+        int totalScore = _scoreData.GetTotalScore(_currentTime);
+        string rank = _scoreData.GetRank(totalScore, missionSuccess);
+
+        ShowResultScreen(missionSuccess, rank, totalScore);
     }
-    
+
     private void CreateRandomMission()
     {
         var idCount = Tables.Instance.GetTable<MissionTd>().GetKeys.Count();
@@ -360,15 +371,18 @@ public class GameController : MonoBehaviour
         switch (type)
         {
             case SnowmanType.Normal:
+                _scoreData.normalPassCount++;
                 mainUI.SetScore(++_score, _currentMissionData.goal);
                 Managers.Sound.Play("SFX_santa", Define.ESoundType.SFX, volume: 1f);
                 break;
             case SnowmanType.Defect:
+                _scoreData.defectPassCount++;  
                 Managers.Sound.Play("SFX_wrong", Define.ESoundType.SFX, volume: 1f);
                 break;
             case SnowmanType.Spy:
+                _isSpyPassed = true;
                 Managers.Sound.Play("SFX_spy", Define.ESoundType.SFX, volume: 1f);
-                break;
+                GameOver(); break;
             case SnowmanType.Invalid:
                 break;
             default:
@@ -378,7 +392,45 @@ public class GameController : MonoBehaviour
     
     private void HandleSnowmanDeath(SnowmanType type)
     {
-        
+        switch (type)
+        {
+            case SnowmanType.Normal:
+                _scoreData.normalKillCount++;
+                Managers.Sound.Play("SFX_wrong", Define.ESoundType.SFX, volume: 1f);
+                break;
+
+            case SnowmanType.Defect:
+                _scoreData.defectKillCount++;
+                Managers.Sound.Play("SFX_correct", Define.ESoundType.SFX, volume: 1f);
+                break;
+
+            case SnowmanType.Spy:
+                _scoreData.spyKillCount++;
+                Managers.Sound.Play("SFX_correct", Define.ESoundType.SFX, volume: 1f);
+                break;
+            case SnowmanType.Invalid:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(type), type, null);
+        }
+    }
+
+    private void ShowResultScreen(bool success, string rank, int totalScore)
+    {
+        Debug.Log($"=== 게임 결과 ===");
+        Debug.Log($"미션 {(success ? "성공" : "실패")}");
+        Debug.Log($"랭크: {rank}");
+        Debug.Log($"정상품 통과: {_scoreData.normalPassCount}");
+        Debug.Log($"불량품 제거: {_scoreData.defectKillCount}");
+        Debug.Log($"오폐기: {_scoreData.normalKillCount}");
+        Debug.Log($"불량품 통과: {_scoreData.defectPassCount}");
+        Debug.Log($"스파이 제거: {_scoreData.spyKillCount}");
+        Debug.Log($"기본 점수: {_scoreData.GetBaseScore()}");
+        Debug.Log($"시간 보너스: {_scoreData.GetTimeBonus(_currentTime)}");
+        Debug.Log($"완벽 보너스: {_scoreData.GetPerfectBonus()}");
+        Debug.Log($"총점: {totalScore}");
+
+        // TODO: 결과 UI 팝업
     }
 
     private void OnDrawGizmos() 
