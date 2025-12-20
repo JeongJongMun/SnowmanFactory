@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Scripts.Manager;
+using Core.Scripts;
 using Core.Scripts.Table;
 using DG.Tweening;
 using UnityEngine;
@@ -114,6 +116,9 @@ public class GameController : MonoBehaviour
         // TODO : Random Gimmick Activation
         _isProcessingGimmick = true;
         gimmickPress.Activate();
+
+        //Sonud
+        Managers.Sound.Play("SFX_press", Define.ESoundType.SFX, volume: 1f);
     }
 
     public void Pass()
@@ -123,6 +128,9 @@ public class GameController : MonoBehaviour
         _isProcessingGimmick = true;
         _currentSnowman.Stop();
         _currentSnowman.MoveImmediate();
+
+        //Sonud
+        Managers.Sound.Play("SFX_swoosh", Define.ESoundType.SFX, volume: 1f);
     }
 
     private void Awake()
