@@ -86,6 +86,7 @@ public class GameController : MonoBehaviour
     
     [SerializeField] private GimmickPress gimmickPress = null;
     [SerializeField] private GimmickFire gimmickFire = null;
+    [SerializeField] private GimmickDoor gimmickDoor = null;
     
     [SerializeField] private Animator animatorRail = null;
 
@@ -172,10 +173,13 @@ public class GameController : MonoBehaviour
 
     private void Init()
     {
+        gimmickDoor.Init();
+        
         gimmickPress.Init();
         gimmickPress.OnStartActivateEvent += () =>
         {
             _currentSnowman.Stop();
+            gimmickDoor.Activate();
         };
         gimmickPress.OnFinishActivateEvent += () =>
         {
@@ -185,7 +189,7 @@ public class GameController : MonoBehaviour
         };
         gimmickPress.OnStartDeactivateEvent += () =>
         {
-            
+            gimmickDoor.Deactivate();
         };
         gimmickPress.OnFinishDeactivateEvent += () =>
         {
@@ -193,9 +197,11 @@ public class GameController : MonoBehaviour
             StartCoroutine(SpawnSnowman());
         };
         
+        gimmickFire.Init();
         gimmickFire.OnStartActivateEvent += () =>
         {
             _currentSnowman.Stop();
+            gimmickDoor.Activate();
         };
         gimmickFire.OnFinishActivateEvent += () =>
         {
@@ -205,7 +211,7 @@ public class GameController : MonoBehaviour
         };
         gimmickFire.OnStartDeactivateEvent += () =>
         {
-            
+            gimmickDoor.Deactivate();
         };
         gimmickFire.OnFinishDeactivateEvent += () =>
         {

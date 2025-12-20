@@ -25,7 +25,7 @@ public class GimmickBase : MonoBehaviour
     {
     }
 
-    virtual public void Deactivate()
+    public void Deactivate()
     {
         OnStartDeactivateEvent?.Invoke();
         OnDeactivate();
