@@ -18,7 +18,7 @@ public class Snowman : MonoBehaviour
         id = data.id;
         Type = type;
         
-        var path = $"Animations/Snowman/{data.fullbody_animator_name}/{data.fullbody_animator_name}";
+        var path = $"Animations/Snowman/{data.fullbody_animator_name}/{data.fullbody_animator_name}_000";
         var controller = Resources.Load<RuntimeAnimatorController>(path);
         if (controller != null)
         {

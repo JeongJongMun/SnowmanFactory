@@ -328,7 +328,7 @@ public class GameController : MonoBehaviour
     
     private void SetupSnowmanAnimator(ISnowmanData data)
     {
-        var path = $"Animations/Snowman/{data.upperbody_animator_name}/{data.upperbody_animator_name}";
+        var path = $"Animations/Snowman/{data.upperbody_animator_name}/{data.upperbody_animator_name}_000";
         var controller = Resources.Load<RuntimeAnimatorController>(path);
         if (controller != null)
         {
