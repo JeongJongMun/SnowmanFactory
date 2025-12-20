@@ -1,3 +1,4 @@
+using System.Collections;
 using Core.Scripts.Manager;
 using Core.Scripts;
 using DG.Tweening;
@@ -5,17 +6,13 @@ using UnityEngine;
 
 public class GimmickPress : GimmickBase
 {
-    [SerializeField] private Transform transformTarget = null;
-    [SerializeField] private float moveDuration = 0.5f;
-    [SerializeField] private float pressionTime = 0.5f;
-    
-    private Vector3 _originPosition = Vector3.zero;
+    [SerializeField] private Animator animator = null;
     
     public override void Init()
     {
         base.Init();
         
-        _originPosition = transform.position;
+        animator.speed = 2.5f;
     }
     
     public override void OnActivate()
@@ -23,28 +20,31 @@ public class GimmickPress : GimmickBase
         base.OnActivate();
         
         transform.DOKill();
-
+        StartCoroutine(PlayAndCallback());
+    }
+    
+    public IEnumerator PlayAndCallback()
+    {
+        animator.SetTrigger("doPlay");
         Managers.Sound.Play("SFX_button", Define.ESoundType.SFX, volume: 2f);
 
-        var seq = DOTween.Sequence();
+        yield return null;
 
-        seq.Append(transform.DOMoveY(transformTarget.position.y, moveDuration).SetEase(Ease.OutQuad));
-        seq.AppendInterval(pressionTime);
-        seq.AppendCallback(() => {
-            OnFinishActivateEvent?.Invoke(); 
-            Deactivate();
-        });
+        float duration = animator.GetCurrentAnimatorStateInfo(0).length;
+
+        yield return new WaitForSeconds(duration / 2.0f);
+
+        OnFinishActivateEvent?.Invoke(); 
+        Deactivate();
+        
+        yield return new WaitForSeconds(duration / 2.0f);
+        
+        OnFinishDeactivateEvent?.Invoke();
     }
     
     public override void OnDeactivate()
     {   
         base.OnDeactivate();
 
-        transform.DOMoveY(_originPosition.y, moveDuration)
-            .SetEase(Ease.OutQuad)
-            .OnComplete(() =>
-            {
-                OnFinishDeactivateEvent?.Invoke();
-            });
     }
 }
