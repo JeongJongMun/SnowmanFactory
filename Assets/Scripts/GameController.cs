@@ -115,12 +115,19 @@ public class GameController : MonoBehaviour
     {
         if (_isProcessingGimmick || _currentSnowman == null) return;
         
-        // TODO : Random Gimmick Activation
+        bool useFireGimmick = UnityEngine.Random.value > 0.5f;
+        if (useFireGimmick)
+        {
+            gimmickFire.Activate();
+        }
+        else
+        {
+            gimmickPress.Activate();
+            Managers.Sound.Play("SFX_press", Define.ESoundType.SFX, volume: 1f);
+        }
+        
         _isProcessingGimmick = true;
-        gimmickPress.Activate();
 
-        //Sonud
-        Managers.Sound.Play("SFX_press", Define.ESoundType.SFX, volume: 1f);
     }
 
     public void Pass()
@@ -171,14 +178,34 @@ public class GameController : MonoBehaviour
         gimmickPress.OnFinishActivateEvent += () =>
         {
             animatorSnowmanUpperbody.runtimeAnimatorController = null;
-            OnSnowmanDeathEvent?.Invoke(_currentSnowman.Type);
             _currentSnowman.Die();
+            OnSnowmanDeathEvent?.Invoke(_currentSnowman.Type);
         };
         gimmickPress.OnStartDeactivateEvent += () =>
         {
             
         };
         gimmickPress.OnFinishDeactivateEvent += () =>
+        {
+            _isProcessingGimmick = false;
+            StartCoroutine(SpawnSnowman());
+        };
+        
+        gimmickFire.OnStartActivateEvent += () =>
+        {
+            _currentSnowman.Stop();
+        };
+        gimmickFire.OnFinishActivateEvent += () =>
+        {
+            animatorSnowmanUpperbody.runtimeAnimatorController = null;
+            _currentSnowman.Die();
+            OnSnowmanDeathEvent?.Invoke(_currentSnowman.Type);
+        };
+        gimmickFire.OnStartDeactivateEvent += () =>
+        {
+            
+        };
+        gimmickFire.OnFinishDeactivateEvent += () =>
         {
             _isProcessingGimmick = false;
             StartCoroutine(SpawnSnowman());

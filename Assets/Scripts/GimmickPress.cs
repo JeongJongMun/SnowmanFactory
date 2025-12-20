@@ -19,7 +19,6 @@ public class GimmickPress : GimmickBase
     {
         base.OnActivate();
         
-        transform.DOKill();
         StartCoroutine(PlayAndCallback());
     }
     
@@ -30,7 +29,7 @@ public class GimmickPress : GimmickBase
 
         yield return null;
 
-        float duration = animator.GetCurrentAnimatorStateInfo(0).length;
+        var duration = animator.GetCurrentAnimatorStateInfo(0).length;
 
         yield return new WaitForSeconds(duration / 2.0f);
 
