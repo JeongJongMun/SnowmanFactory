@@ -5,8 +5,12 @@ public class UIMain : MonoBehaviour
 {
     [SerializeField] private Button buttonKill = null;
     [SerializeField] private Button buttonPass = null;
+    [SerializeField] private Button buttonInstruction = null;
+    
     [SerializeField] private Slider sliderTimer = null;
+    
     [SerializeField] private UIScore scoreUI = null;
+    [SerializeField] private UIInstruction instructionUI = null;
 
     [SerializeField] private GameController controller = null;
     
@@ -35,6 +39,11 @@ public class UIMain : MonoBehaviour
         buttonPass.onClick.AddListener(() =>
         {
             controller.Pass();
+        });
+        
+        buttonInstruction.onClick.AddListener(() =>
+        {
+            instructionUI.Toggle();
         });
     }
 }
