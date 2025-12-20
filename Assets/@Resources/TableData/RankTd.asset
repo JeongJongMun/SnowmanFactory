@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e793af172d062f24287a5f66ffea7136, type: 3}
+  m_Name: RankTd
+  m_EditorClassIdentifier: 
+  mFirstKey:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  mSecondKey: []
+  mDataList:
+  - _id: 0
+    _rank: S
+    _min_score: 3500
+    _max_defect_pass: 0
+  - _id: 1
+    _rank: A
+    _min_score: 2500
+    _max_defect_pass: 2
+  - _id: 2
+    _rank: B
+    _min_score: 1500
+    _max_defect_pass: 999
+  - _id: 3
+    _rank: C
+    _min_score: 500
+    _max_defect_pass: 999
+  - _id: 4
+    _rank: D
+    _min_score: 1
+    _max_defect_pass: 999
+  - _id: 5
+    _rank: F
+    _min_score: 0
+    _max_defect_pass: 999
