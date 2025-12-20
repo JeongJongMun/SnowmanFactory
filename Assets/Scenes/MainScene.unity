@@ -497,6 +497,7 @@ MonoBehaviour:
   arrivalPoint: {fileID: 1846932151}
   gimmickPress: {fileID: 156378381}
   gimmickFire: {fileID: 558967399}
+  animatorRail: {fileID: 147379648}
   mainUI: {fileID: 1533216581}
   defectRate: 0.5
 --- !u!1 &328189350

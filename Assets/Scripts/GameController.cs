@@ -86,6 +86,8 @@ public class GameController : MonoBehaviour
     
     [SerializeField] private GimmickPress gimmickPress = null;
     [SerializeField] private GimmickFire gimmickFire = null;
+    
+    [SerializeField] private Animator animatorRail = null;
 
     [SerializeField] private UIMain mainUI = null;
 
@@ -96,7 +98,6 @@ public class GameController : MonoBehaviour
     private bool _isPlaying = false;
     private int _score = 0;
     
-    private float _railAnimationPlayRate = 1.0f;
     private Snowman _currentSnowman = null;
     
     private Queue<SnowmanType> _snowmanSpawnQueue = new Queue<SnowmanType>();
@@ -161,8 +162,6 @@ public class GameController : MonoBehaviour
 
     private void Init()
     {
-        _railAnimationPlayRate = 1.0f;
-        
         gimmickPress.Init();
         gimmickPress.OnStartActivateEvent += () =>
         {
@@ -205,7 +204,6 @@ public class GameController : MonoBehaviour
     private void Release()
     {
         _score = 0;
-        _railAnimationPlayRate = 1.0f;
         _isProcessingGimmick = false;
     }
     
@@ -283,7 +281,7 @@ public class GameController : MonoBehaviour
         }
         
         var idx = _productionData.totalQuantity - _snowmanSpawnQueue.Count;
-    
+        UpdateRailSpeed(idx);
         var moveDuration = _productionPeriodData.GetMoveDuration(idx);
         var spawnInterval = _productionPeriodData.GetSpawnInterval(idx);
 
@@ -334,6 +332,20 @@ public class GameController : MonoBehaviour
         if (controller != null)
         {
             animatorSnowmanUpperbody.runtimeAnimatorController = controller;
+        }
+    }
+
+    private void UpdateRailSpeed(int idx)
+    {
+        var standardDuration = _productionPeriodData.GetMoveDuration(0);
+        var currentDuration = _productionPeriodData.GetMoveDuration(idx);
+        
+        var playRate = standardDuration / currentDuration;
+
+        if (animatorRail)
+        {
+            animatorRail.speed = playRate;
+            Debug.Log($"Rail Speed Updated : {playRate}, Index : {idx}, standardDuration : {standardDuration}, currentDuration : {currentDuration}");
         }
     }
     
