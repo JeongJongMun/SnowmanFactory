@@ -15,6 +15,7 @@ MonoBehaviour:
   mFirstKey:
   - 0
   - 1
+  - 2
   mSecondKey: []
   mDataList:
   - _id: 0
@@ -23,3 +24,6 @@ MonoBehaviour:
   - _id: 1
     _upperbody_animator_name: p_snowman_upperbody_002
     _fullbody_animator_name: p_snowman_fullbody_002
+  - _id: 2
+    _upperbody_animator_name: p_snowman_upperbody_003
+    _fullbody_animator_name: p_snowman_fullbody_003

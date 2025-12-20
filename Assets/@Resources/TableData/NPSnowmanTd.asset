@@ -20,6 +20,14 @@ MonoBehaviour:
   - 4
   - 5
   - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
   mSecondKey: []
   mDataList:
   - _id: 0
@@ -43,3 +51,27 @@ MonoBehaviour:
   - _id: 6
     _upperbody_animator_name: np_snowman_upperbody_007
     _fullbody_animator_name: np_snowman_fullbody_007
+  - _id: 7
+    _upperbody_animator_name: np_snowman_upperbody_008
+    _fullbody_animator_name: np_snowman_fullbody_008
+  - _id: 8
+    _upperbody_animator_name: np_snowman_upperbody_009
+    _fullbody_animator_name: np_snowman_fullbody_009
+  - _id: 9
+    _upperbody_animator_name: np_snowman_upperbody_010
+    _fullbody_animator_name: np_snowman_fullbody_010
+  - _id: 10
+    _upperbody_animator_name: np_snowman_upperbody_011
+    _fullbody_animator_name: np_snowman_fullbody_011
+  - _id: 11
+    _upperbody_animator_name: np_snowman_upperbody_012
+    _fullbody_animator_name: np_snowman_fullbody_012
+  - _id: 12
+    _upperbody_animator_name: np_snowman_upperbody_013
+    _fullbody_animator_name: np_snowman_fullbody_013
+  - _id: 13
+    _upperbody_animator_name: np_snowman_upperbody_014
+    _fullbody_animator_name: np_snowman_fullbody_014
+  - _id: 14
+    _upperbody_animator_name: np_snowman_upperbody_015
+    _fullbody_animator_name: np_snowman_fullbody_015
