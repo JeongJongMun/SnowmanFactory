@@ -6,12 +6,18 @@ public class UIMain : MonoBehaviour
     [SerializeField] private Button buttonKill = null;
     [SerializeField] private Button buttonPass = null;
     [SerializeField] private Slider sliderTimer = null;
+    [SerializeField] private UIScore scoreUI = null;
 
     [SerializeField] private GameController controller = null;
     
     public void SetTimerSlider(float value)
     {
         sliderTimer.value = value;
+    }
+    
+    public void SetScore(int score, int goal)
+    {
+        scoreUI.SetScore(score, goal);
     }
     
     private void Awake()

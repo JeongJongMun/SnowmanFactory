@@ -94,6 +94,7 @@ public class GameController : MonoBehaviour
     private float _totalTime = 0.0f;
     private float _currentTime = 0.0f;
     private bool _isPlaying = false;
+    private int _score = 0;
     
     private float _railAnimationPlayRate = 1.0f;
     private Snowman _currentSnowman = null;
@@ -101,7 +102,7 @@ public class GameController : MonoBehaviour
     private Queue<SnowmanType> _snowmanSpawnQueue = new Queue<SnowmanType>();
     private ProductionData _productionData = new ProductionData();
     private ProductionPeriodData _productionPeriodData = new ProductionPeriodData();
-    
+    private MissionTdData _currentMissionData = null;
 
     private bool _isProcessingGimmick = false;
     
@@ -203,6 +204,7 @@ public class GameController : MonoBehaviour
 
     private void Release()
     {
+        _score = 0;
         _railAnimationPlayRate = 1.0f;
         _isProcessingGimmick = false;
     }
@@ -217,16 +219,18 @@ public class GameController : MonoBehaviour
     {
         var idCount = Tables.Instance.GetTable<MissionTd>().GetKeys.Count();
         var id = UnityEngine.Random.Range(0, idCount);
-        var data = Tables.Instance.GetTable<MissionTd>().GetData(id);
-        if (data == null) return;
+        _currentMissionData = Tables.Instance.GetTable<MissionTd>().GetData(id);
+        if (_currentMissionData == null) return;
         
-        Debug.LogWarning($"Start Mission ID : {data.id}, Goal : {data.goal}, Time : {data.time}");
-
-        _totalTime = _currentTime = data.time;
+        Debug.LogWarning($"Start Mission ID : {_currentMissionData.id}, Goal : {_currentMissionData.goal}, Time : {_currentMissionData.time}");
+        
+        mainUI.SetScore(0, _currentMissionData.goal);
         mainUI.SetTimerSlider(0.0f);
+        
+        _totalTime = _currentTime = _currentMissionData.time;
         _isPlaying = true;
         
-        GenerateSpawnQueue(data);
+        GenerateSpawnQueue(_currentMissionData);
     }
     
     private void GenerateSpawnQueue(MissionTdData missionData)
@@ -340,7 +344,20 @@ public class GameController : MonoBehaviour
 
     private void HandleSnowmanArrival(SnowmanType type)
     {
-        
+        switch (type)
+        {
+            case SnowmanType.Normal:
+                mainUI.SetScore(++_score, _currentMissionData.goal);
+                break;
+            case SnowmanType.Defect:
+                break;
+            case SnowmanType.Spy:
+                break;
+            case SnowmanType.Invalid:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(type), type, null);
+        }
     }
     
     private void HandleSnowmanDeath(SnowmanType type)
