@@ -238,6 +238,7 @@ public class GameController : MonoBehaviour
 
     private void Release()
     {
+        _scoreData.Reset();
         _currentSnowman = null;
         _snowmanSpawnQueue.Clear();
         _isSpyPassed = false;
