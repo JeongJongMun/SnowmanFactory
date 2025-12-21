@@ -6,6 +6,8 @@ using Core.Scripts.Manager;
 using Core.Scripts;
 using Core.Scripts.Table;
 using DG.Tweening;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine;
 
 public interface ISnowmanData
@@ -94,6 +96,10 @@ public class GameController : MonoBehaviour
 
     [SerializeField] private float defectRate = 0.5f;
 
+    [SerializeField] private Volume globalVolume = null;
+    private Vignette _vignette = null;
+    [SerializeField] private float warningVignetteIntensity = 0.275f;
+
     private float _totalTime = 0.0f;
     private float _currentTime = 0.0f;
     private bool _isPlaying = false;
@@ -172,6 +178,11 @@ public class GameController : MonoBehaviour
 
     private void Init()
     {
+        if (globalVolume != null && globalVolume.profile.TryGet(out _vignette))
+        {
+            _vignette.intensity.value = 0f; 
+        }
+
         gimmickDoor.Init();
         
         gimmickPress.Init();
@@ -239,6 +250,10 @@ public class GameController : MonoBehaviour
     private void Release()
     {
         _scoreData.Reset();
+        if (_vignette != null)
+        {
+            _vignette.intensity.value = 0f;
+        }
         _currentSnowman = null;
         _snowmanSpawnQueue.Clear();
         _isSpyPassed = false;
@@ -399,7 +414,37 @@ public class GameController : MonoBehaviour
             Debug.Log($"Rail Speed Updated : {playRate}, Index : {idx}, standardDuration : {standardDuration}, currentDuration : {currentDuration}");
         }
     }
-    
+
+    private IEnumerator FlashVignette(Color color, int flashCount = 2)
+    {
+        if (_vignette == null) yield break;
+
+        var originalColor = _vignette.color.value;
+        var originalIntensity = _vignette.intensity.value;
+
+        for (int i = 0; i < flashCount; i++)
+        {
+            // 켜기
+            _vignette.color.value = color;
+            DOTween.To(() => _vignette.intensity.value,
+                       x => _vignette.intensity.value = x,
+                       warningVignetteIntensity,
+                       0.1f);
+
+            yield return new WaitForSeconds(0.15f);
+
+            // 끄기
+            DOTween.To(() => _vignette.intensity.value,
+                       x => _vignette.intensity.value = x,
+                       originalIntensity,
+                       0.1f);
+
+            yield return new WaitForSeconds(0.15f);
+        }
+
+        _vignette.color.value = originalColor;
+    }
+
     private void HandleSnowmanSpawn(SnowmanType type)
     {
         
@@ -421,11 +466,13 @@ public class GameController : MonoBehaviour
                 Managers.Sound.Play("SFX_santa", Define.ESoundType.SFX, volume: 1f);
                 break;
             case SnowmanType.Defect:
-                _scoreData.defectPassCount++;  
+                _scoreData.defectPassCount++;
+                StartCoroutine(FlashVignette(new Color(82f / 255f, 0f, 0f), 3));
                 Managers.Sound.Play("SFX_wrong", Define.ESoundType.SFX, volume: 1f);
                 break;
             case SnowmanType.Spy:
                 _isSpyPassed = true;
+                StartCoroutine(FlashVignette(new Color(82f / 255f, 0f, 0f), 3));
                 Managers.Sound.Play("SFX_spy", Define.ESoundType.SFX, volume: 1f);
                 GameOver(); break;
             case SnowmanType.Invalid:
@@ -441,6 +488,7 @@ public class GameController : MonoBehaviour
         {
             case SnowmanType.Normal:
                 _scoreData.normalKillCount++;
+                StartCoroutine(FlashVignette(new Color(82f / 255f, 0f, 0f), 3));
                 Managers.Sound.Play("SFX_wrong", Define.ESoundType.SFX, volume: 1f);
                 break;
 
