@@ -19,11 +19,11 @@ MonoBehaviour:
   mSecondKey: []
   mDataList:
   - _id: 0
-    _time: 5
+    _time: 60
     _goal: 10
   - _id: 1
-    _time: 5
+    _time: 90
     _goal: 20
   - _id: 2
-    _time: 5
+    _time: 120
     _goal: 35
