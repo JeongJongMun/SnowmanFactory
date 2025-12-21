@@ -12,7 +12,7 @@ public class GimmickPress : GimmickBase
     {
         base.Init();
         
-        animator.speed = 2.5f;
+        animator.speed = 2.0f;
     }
     
     public override void OnActivate()
