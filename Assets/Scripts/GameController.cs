@@ -475,18 +475,4 @@ public class GameController : MonoBehaviour
 
         // TODO: 결과 UI 팝업
     }
-
-    private void OnDrawGizmos() 
-    {
-        if (spawnPoint == null || arrivalPoint == null) return;
-
-        Gizmos.color = Color.green;
-        Gizmos.DrawSphere(spawnPoint.position, 30.0f);
-
-        Gizmos.color = Color.red;
-        Gizmos.DrawSphere(arrivalPoint.position, 30.0f);
-
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(spawnPoint.position, arrivalPoint.position);
-    }
 }
