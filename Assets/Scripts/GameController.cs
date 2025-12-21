@@ -238,6 +238,9 @@ public class GameController : MonoBehaviour
 
     private void Release()
     {
+        _currentSnowman = null;
+        _snowmanSpawnQueue.Clear();
+        _isSpyPassed = false;
         _score = 0;
         _isProcessingGimmick = false;
     }
@@ -246,13 +249,11 @@ public class GameController : MonoBehaviour
     {
         if (!_isPlaying) return; 
 
-        Debug.LogError("GameOver");
         _isPlaying = false;
 
-        bool missionSuccess = !_isSpyPassed && _score >= _currentMissionData.goal;
-
-        int totalScore = _scoreData.GetTotalScore(_currentTime);
-        string rank = _scoreData.GetRank(totalScore, missionSuccess);
+        var missionSuccess = !_isSpyPassed && _score >= _currentMissionData.goal;
+        var totalScore = _scoreData.GetTotalScore(_currentTime);
+        var rank = _scoreData.GetRank(totalScore, missionSuccess);
 
         ShowResultScreen(missionSuccess, rank, totalScore);
     }
@@ -473,6 +474,11 @@ public class GameController : MonoBehaviour
         Debug.Log($"완벽 보너스: {_scoreData.GetPerfectBonus()}");
         Debug.Log($"총점: {totalScore}");
 
-        // TODO: 결과 UI 팝업
+        var resultPopup = Managers.UI.ShowPopupUI<ResultPopup>();
+        resultPopup.Init(_scoreData, rank, totalScore, (int)_currentTime, () =>
+        {
+            Release();
+            DOVirtual.DelayedCall(0.5f, PrepareGame);
+        });
     }
 }
