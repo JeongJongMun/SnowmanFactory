@@ -476,7 +476,7 @@ public class GameController : MonoBehaviour
         Debug.Log($"총점: {totalScore}");
 
         var resultPopup = Managers.UI.ShowPopupUI<ResultPopup>();
-        resultPopup.Init(_scoreData, rank, totalScore, (int)_currentTime, () =>
+        resultPopup.Init(_scoreData, rank, totalScore, (int)_totalTime - (int)_currentTime, () =>
         {
             Release();
             DOVirtual.DelayedCall(0.5f, PrepareGame);
