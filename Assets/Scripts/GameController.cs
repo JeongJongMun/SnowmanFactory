@@ -153,8 +153,7 @@ public class GameController : MonoBehaviour
 
     private void Start()
     {
-        CreateRandomMission();
-        StartCoroutine(SpawnSnowman());
+        PrepareGame();
     }
 
     private void Update()
@@ -258,26 +257,29 @@ public class GameController : MonoBehaviour
         ShowResultScreen(missionSuccess, rank, totalScore);
     }
 
-    private void CreateRandomMission()
+    private void PrepareGame()
     {
         var idCount = Tables.Instance.GetTable<MissionTd>().GetKeys.Count();
         var id = UnityEngine.Random.Range(0, idCount);
         _currentMissionData = Tables.Instance.GetTable<MissionTd>().GetData(id);
         if (_currentMissionData == null) return;
         
-        Debug.LogWarning($"Start Mission ID : {_currentMissionData.id}, Goal : {_currentMissionData.goal}, Time : {_currentMissionData.time}");
+        var missionPopup = Managers.UI.ShowPopupUI<MissionPopup>();
+        missionPopup.Init(_currentMissionData.time, _currentMissionData.goal);
+        missionPopup.OnAfterCloseAction += () =>
+        {
+            StartGame(_currentMissionData);
+        };
         
         mainUI.SetScore(0, _currentMissionData.goal);
         mainUI.SetTimerSlider(0.0f);
-        
+    }
+    
+    private void StartGame(MissionTdData missionData)
+    {
         _totalTime = _currentTime = _currentMissionData.time;
         _isPlaying = true;
         
-        GenerateSpawnQueue(_currentMissionData);
-    }
-    
-    private void GenerateSpawnQueue(MissionTdData missionData)
-    {
         _productionData.Initialize(missionData.goal);
     
         var typeList = CreateSnowmanTypeList(_productionData);
@@ -287,6 +289,8 @@ public class GameController : MonoBehaviour
         SetSpawnQueue(typeList);
 
         _productionPeriodData.SetProductionFlow(_productionData.totalQuantity, missionData.time);
+        
+        StartCoroutine(SpawnSnowman());
     }
 
     private List<SnowmanType> CreateSnowmanTypeList(ProductionData data)
