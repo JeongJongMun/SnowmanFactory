@@ -122,7 +122,6 @@ MonoBehaviour:
   frame: {fileID: 8793270792952347380}
   imageDim: {fileID: 1984573540613603140}
   buttonClose: {fileID: 6152998143004689935}
-  textTitle: {fileID: 0}
   textDescription: {fileID: 6442793626041628557}
 --- !u!1 &2306372721319870011
 GameObject:
@@ -384,7 +383,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uBBF8\uC158 \uB0B4\uC6A9 \u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B\u314B"
+  m_text: "\uC81C\uD488 \uC124\uBA85\uC11C\uB97C \uCC38\uACE0\uD558\uC5EC \uB208\uC0AC\uB78C
+    \uC640\uAC1C\uB97C \uC5D1\uCD08 \uB0B4\uC5D0 \uB0A9\uD488\uD558\uB77C."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 2698a342303a9e9498a789da433c831e, type: 2}
   m_sharedMaterial: {fileID: -6315354493853322429, guid: 2698a342303a9e9498a789da433c831e, type: 2}
@@ -411,8 +411,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 50
+  m_fontSizeBase: 50
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 35
