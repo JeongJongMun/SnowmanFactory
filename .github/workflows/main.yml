@@ -1,35 +1,43 @@
 name: Automated Build
 
 on:
-  push: # main 브랜치에 Push가 되면 빌드가 되도록 동작시킵니다.
-    branches: [ main ]
-    
+  # itch.io 업로드용 빌드가 필요할 때 Actions 탭에서 수동으로 실행합니다.
+  workflow_dispatch:
+
 jobs:
-  buildAndroid:
-    name: Android Build
+  build:
+    name: Build ${{ matrix.targetPlatform }}
     runs-on: ubuntu-latest
-    
+    strategy:
+      # 한쪽이 깨져도 다른 플랫폼 빌드는 끝까지 갑니다.
+      fail-fast: false
+      matrix:
+        targetPlatform: [WebGL, Android]
+
     steps:
-      # Checkout
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           lfs: true
 
-      # 캐시파일을 생성하여 다음 빌드시 더 빠르게 빌드를 할 수 있도록 해줍니다.
-      - uses: actions/cache@v4
+      # 안드로이드 에디터 이미지가 커서 러너 디스크가 부족해지기 쉽습니다.
+      # 빌드와 무관한 사전 설치 툴체인만 지웁니다.
+      - name: Free disk space
+        if: matrix.targetPlatform == 'Android'
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost /usr/share/swift || true
+          df -h /
+
+      # Library는 플랫폼마다 임포트 결과가 달라 캐시를 섞으면 안 됩니다.
+      - name: Cache Library
+        uses: actions/cache@v4
         with:
           path: Library
-          key: Library-${{ runner.os }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          key: Library-${{ matrix.targetPlatform }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
           restore-keys: |
-            Library-${{ runner.os }}-
+            Library-${{ matrix.targetPlatform }}-
             Library-
 
-      # Android SDK 설정
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      # Build
       - name: Build project
         uses: game-ci/unity-builder@v4
         env:
@@ -37,12 +45,45 @@ jobs:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
-          targetPlatform: Android
-          buildName: UnityBuild
+          targetPlatform: ${{ matrix.targetPlatform }}
+          buildName: Snowman
           androidExportType: androidPackage # APK 빌드
 
-      # Output
-      - uses: actions/upload-artifact@v4
+      # 플랫폼마다 itch.io에 바로 올릴 수 있는 파일 하나만 남깁니다.
+      - name: Package artifact
+        run: |
+          set -euo pipefail
+          sudo chown -R $USER build
+          mkdir -p dist
+
+          case "${{ matrix.targetPlatform }}" in
+            WebGL)
+              # itch.io는 zip 최상단에 index.html이 있어야 HTML 게임으로 인식합니다.
+              INDEX=$(find build/WebGL -name index.html | head -n1)
+              if [ -z "$INDEX" ]; then
+                echo "::error::WebGL 빌드에서 index.html을 찾지 못했습니다"
+                ls -R build/WebGL
+                exit 1
+              fi
+              (cd "$(dirname "$INDEX")" && zip -qr "$GITHUB_WORKSPACE/dist/Snowman-WebGL.zip" .)
+              ;;
+
+            Android)
+              APK=$(find build/Android -name "*.apk" | head -n1)
+              if [ -z "$APK" ]; then
+                echo "::error::Android 빌드에서 apk를 찾지 못했습니다"
+                ls -R build/Android
+                exit 1
+              fi
+              cp "$APK" dist/Snowman-Android.apk
+              ;;
+          esac
+
+          ls -lh dist
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: UnityBuild-Android
-          path: build
+          name: Snowman-${{ matrix.targetPlatform }}
+          path: dist
+          retention-days: 7
