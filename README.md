@@ -41,5 +41,5 @@
 
 ## 개발
 
-- Unity 2022.3 · URP · Addressables
+- Unity 2022.3
 - GitHub Actions 자동 빌드 (WebGL / Android)
